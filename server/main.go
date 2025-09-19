@@ -15,10 +15,13 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	if err := registerAuthRPC(initializer); err != nil {
 		return err
 	}
-    if err := registerMatch(initializer); err != nil {
-        return err
-    }
-    if err := registerCreateMatchRPC(initializer); err != nil {
+	if err := registerMatch(initializer); err != nil {
+		return err
+	}
+	if err := registerCreateMatchRPC(initializer); err != nil {
+		return err
+	}
+    if err := registerMatchmaker(initializer); err != nil {
         return err
     }
 

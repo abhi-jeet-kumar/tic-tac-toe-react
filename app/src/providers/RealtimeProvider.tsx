@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Socket } from '@heroiclabs/nakama-js';
-import { connectSocketWithRetry, getSocket } from '@api/nakama';
+import { connectSocketWithRetry, getSocket, joinQueue, leaveQueue } from '@api/nakama';
 import { useAuth } from './AuthProvider';
 
 interface RealtimeContextValue {
   socket: Socket | null;
   isConnected: boolean;
+  enqueue: (mode: 'casual' | 'ranked') => Promise<string>;
+  dequeue: (ticket: string) => Promise<void>;
 }
 
 const RealtimeContext = createContext<RealtimeContextValue | undefined>(undefined);
@@ -28,7 +30,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => { canceled = true; };
   }, [token]);
 
-  const value = useMemo(() => ({ socket: socketRef.current, isConnected }), [isConnected]);
+  const enqueue = async (mode: 'casual' | 'ranked') => {
+    return joinQueue(mode).then(t => t.ticket);
+  };
+  const dequeue = async (ticket: string) => {
+    await leaveQueue(ticket);
+  };
+
+  const value = useMemo(() => ({ socket: socketRef.current, isConnected, enqueue, dequeue }), [isConnected]);
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 };
 

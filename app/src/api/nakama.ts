@@ -56,3 +56,14 @@ export async function connectSocketWithRetry(tok: string, onClose?: () => void) 
   return s;
 }
 
+export async function joinQueue(mode: 'casual' | 'ranked') {
+  const s = getSocket();
+  const ticket = await s.addMatchmaker(2, 2, undefined, { mode });
+  return ticket;
+}
+
+export async function leaveQueue(ticket: string) {
+  const s = getSocket();
+  await s.removeMatchmaker(ticket);
+}
+
