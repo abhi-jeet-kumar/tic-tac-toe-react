@@ -61,6 +61,10 @@ func (m *TicTacToeMatch) MatchLeave(ctx context.Context, logger runtime.Logger, 
 
 func (m *TicTacToeMatch) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, dispatcher runtime.MatchDispatcher, tick int64, state interface{}, messages []runtime.MatchData) interface{} {
     st := state.(*MatchState)
+    // Turn timeout: 30s
+    if st.Winner == 0 && time.Since(st.StartedAt) > 30*time.Second {
+        st.Winner = other(st.Turn) // opponent wins on timeout
+    }
     for _, msg := range messages {
         if msg.GetOpCode() == OpMove && st.Winner == 0 {
             var mv MovePayload
@@ -70,7 +74,14 @@ func (m *TicTacToeMatch) MatchLoop(ctx context.Context, logger runtime.Logger, d
             if st.Board[mv.Index] != 0 { continue }
             st.Board[mv.Index] = mark
             if checkWin(st.Board, mark) { st.Winner = mark }
+            // draw detection
+            if st.Winner == 0 {
+                full := true
+                for _, v := range st.Board { if v == 0 { full = false; break } }
+                if full { st.Winner = '.' } // '.' denotes draw
+            }
             if st.Winner == 0 { st.Turn = other(mark) }
+            st.StartedAt = time.Now()
             payload, _ := json.Marshal(map[string]interface{}{
                 "board": stringFromBoard(st.Board),
                 "turn": string([]rune{st.Turn}),
