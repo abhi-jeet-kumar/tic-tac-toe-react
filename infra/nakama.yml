@@ -1,0 +1,12 @@
+name: "dev"
+logger:
+  level: "DEBUG"
+console:
+  port: 7351
+  username: "admin"
+  password: "password"
+  signing_key: "localdevsigningkey"
+session:
+  encryption_key: "local_session_encryption_key_32bytes!!"
+runtime:
+  http_key: "defaultkey"
