@@ -35,15 +35,10 @@ build_plugin() {
   require docker
   local goarch; goarch=$(detect_goarch)
   mkdir -p "$SERVER_DIR/bin"
-  # Prefer Heroic Labs pluginbuilder (smaller, includes needed toolchain)
-  if docker pull heroiclabs/nakama-pluginbuilder:3.23 >/dev/null 2>&1; then
-    docker run --rm -v "$SERVER_DIR":/work -w /work heroiclabs/nakama-pluginbuilder:3.23 \
-      sh -lc "go version && go env && go mod download && GOOS=linux GOARCH=$goarch go build -buildmode=plugin -o bin/tictactoe.so ."
-  else
-    # Fallback to golang image
-    docker run --rm -v "$SERVER_DIR":/work -w /work golang:1.22 \
-      sh -lc "go version && go env && go mod download && GOOS=linux GOARCH=$goarch go build -buildmode=plugin -o bin/tictactoe.so ."
-  fi
+  # Use Debian-based golang image to ensure glibc compatibility with Nakama image
+  docker pull -q golang:1.22 >/dev/null 2>&1 || true
+  docker run --rm -v "$SERVER_DIR":/work -w /work golang:1.22 \
+    bash -lc "go version && go env && go mod download && GOOS=linux GOARCH=$goarch go build -buildmode=plugin -o bin/tictactoe.so ."
   ls -la "$SERVER_DIR/bin"
 }
 
