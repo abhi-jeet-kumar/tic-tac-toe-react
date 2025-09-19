@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node
+node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo/React Native
+.expo/
+.expo-shared/
+web-build/
+android/
+ios/
+
+# Go
+bin/
+*.exe
+*.test
+*.out
+
+# Env
+.env
+.env.*
+
+# Others
+coverage/
+dist/
+build/
+.tmp/
