@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, Button, SafeAreaView } from 'react-native';
 import { AuthProvider, useAuth } from './src/providers/AuthProvider';
+import { RealtimeProvider } from './src/providers/RealtimeProvider';
 
 function Home() {
   const { isAuthed, login, logout, username } = useAuth();
@@ -24,7 +25,9 @@ function Home() {
 export default function App() {
   return (
     <AuthProvider>
-      <Home />
+      <RealtimeProvider>
+        <Home />
+      </RealtimeProvider>
     </AuthProvider>
   );
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -14,7 +15,12 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	if err := registerAuthRPC(initializer); err != nil {
 		return err
 	}
+    if err := registerMatch(initializer); err != nil {
+        return err
+    }
+    if err := registerCreateMatchRPC(initializer); err != nil {
+        return err
+    }
 
 	return nil
 }
-
