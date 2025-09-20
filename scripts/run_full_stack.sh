@@ -43,7 +43,7 @@ build_plugin() {
   mkdir -p "$SERVER_DIR/bin"
   # Use Debian-based golang image, force platform and PATH so 'go' is resolvable
   docker run --rm --platform "$dplat" -v "$SERVER_DIR":/work -w /work golang:1.22 \
-    bash -lc "export PATH=/usr/local/go/bin:\$PATH; /usr/local/go/bin/go version; /usr/local/go/bin/go env; /usr/local/go/bin/go mod download; GOOS=linux GOARCH=$goarch /usr/local/go/bin/go build -buildmode=plugin -o bin/tictactoe.so ."
+    bash -lc "export PATH=/usr/local/go/bin:\$PATH; /usr/local/go/bin/go version; /usr/local/go/bin/go env; /usr/local/go/bin/go mod tidy; GOOS=linux GOARCH=$goarch /usr/local/go/bin/go build -buildmode=plugin -o bin/tictactoe.so ."
   ls -la "$SERVER_DIR/bin"
 }
 
