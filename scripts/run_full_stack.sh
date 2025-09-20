@@ -30,15 +30,20 @@ detect_goarch() {
   esac
 }
 
+docker_platform() {
+  local ga; ga=$(detect_goarch)
+  if [ "$ga" = "arm64" ]; then echo linux/arm64; else echo linux/amd64; fi
+}
+
 build_plugin() {
   echo "[+] Building Nakama Go plugin (Linux $(detect_goarch))"
   require docker
   local goarch; goarch=$(detect_goarch)
+  local dplat; dplat=$(docker_platform)
   mkdir -p "$SERVER_DIR/bin"
-  # Use Debian-based golang image to ensure glibc compatibility with Nakama image
-  docker pull -q golang:1.22 >/dev/null 2>&1 || true
-  docker run --rm -v "$SERVER_DIR":/work -w /work golang:1.22 \
-    bash -lc "go version && go env && go mod download && GOOS=linux GOARCH=$goarch go build -buildmode=plugin -o bin/tictactoe.so ."
+  # Use Debian-based golang image, force platform and PATH so 'go' is resolvable
+  docker run --rm --platform "$dplat" -v "$SERVER_DIR":/work -w /work golang:1.22 \
+    bash -lc "export PATH=/usr/local/go/bin:\$PATH; /usr/local/go/bin/go version; /usr/local/go/bin/go env; /usr/local/go/bin/go mod download; GOOS=linux GOARCH=$goarch /usr/local/go/bin/go build -buildmode=plugin -o bin/tictactoe.so ."
   ls -la "$SERVER_DIR/bin"
 }
 
